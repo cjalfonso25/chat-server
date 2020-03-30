@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 io.on("connection", socket => {
   socket.on("join", ({ username, room }, callback) => {
