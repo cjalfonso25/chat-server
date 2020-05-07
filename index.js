@@ -5,9 +5,29 @@ const cors = require("cors");
 const { addUser, getUser, getUsersInRoom, removeUser } = require("./src/users");
 
 const app = express();
+app.use(cors());
+
 const server = http.createServer(app);
-server.use(cors());
-const io = socketio(server);
+const io = socketio(server, {
+  handlePreflightRequest: (req, res) => {
+    const headers = {
+      "Access-Control-Allow-Headers":
+        "Origin, X-Requested-With, Content-Type, Accept",
+      "Access-Control-Allow-Origin": "*", //or the specific origin you want to give access to,
+    };
+    res.writeHead(200, headers);
+    res.end();
+  },
+});
+
+// app.use(function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 
 const port = process.env.PORT;
 
