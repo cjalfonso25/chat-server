@@ -1,15 +1,18 @@
 const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
+const cors = require("cors");
 const { addUser, getUser, getUsersInRoom, removeUser } = require("./src/users");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server, { wsEngine: "ws" });
 
+app.use(cors());
+
 const port = process.env.PORT;
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
   socket.on("join", ({ username, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, username, room });
 
@@ -17,24 +20,24 @@ io.on("connection", socket => {
 
     socket.emit("message", {
       username: "Admin",
-      text: `Welcome to room: ${room}!`
+      text: `Welcome to room: ${room}!`,
     });
     socket.broadcast.to(user.room).emit("message", {
       username: "Admin",
       text: `${user.username} has joined!`,
-      createdAt: new Date().getTime()
+      createdAt: new Date().getTime(),
     });
 
     io.to(user.room).emit("roomData", {
       room: user.room,
-      users: getUsersInRoom(user.room)
+      users: getUsersInRoom(user.room),
     });
 
     io.emit("rooms", { room: user.room, users: getUsersInRoom(user.room) });
 
     if (!user) {
       return {
-        error
+        error,
       };
     }
 
@@ -47,7 +50,7 @@ io.on("connection", socket => {
     io.to(user.room).emit("message", {
       username: user.username,
       text: message,
-      createdAt: new Date().getTime()
+      createdAt: new Date().getTime(),
     });
     callback();
   });
@@ -58,12 +61,12 @@ io.on("connection", socket => {
     if (user) {
       io.to(user.room).emit("message", {
         username: "Admin",
-        text: `${user.username} has left!`
+        text: `${user.username} has left!`,
       });
 
       io.to(user.room).emit("roomData", {
         room: user.room,
-        users: getUsersInRoom(user.room)
+        users: getUsersInRoom(user.room),
       });
     }
   });
