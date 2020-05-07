@@ -8,17 +8,7 @@ const app = express();
 app.use(cors());
 
 const server = http.createServer(app);
-const io = socketio(server, {
-  handlePreflightRequest: (req, res) => {
-    const headers = {
-      "Access-Control-Allow-Headers":
-        "Origin, X-Requested-With, Content-Type, Accept",
-      "Access-Control-Allow-Origin": "*", //or the specific origin you want to give access to,
-    };
-    res.writeHead(200, headers);
-    res.end();
-  },
-});
+const io = socketio(server, { origins: "*:*" });
 
 // app.use(function (req, res, next) {
 //   res.header("Access-Control-Allow-Origin", "*");
