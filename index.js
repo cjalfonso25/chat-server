@@ -4,13 +4,23 @@ const socketio = require("socket.io");
 const cors = require("cors");
 const { addUser, getUser, getUsersInRoom, removeUser } = require("./src/users");
 
+const port = process.env.PORT;
 const app = express();
-const server = http.createServer(app);
-const io = socketio(server, { wsEngine: "ws" });
-
 app.use(cors());
 
-const port = process.env.PORT;
+const server = http.createServer(app);
+const io = socketio(server, {
+  handlePreflightRequest: (req, res) => {
+    const headers = {
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
+      "Access-Control-Allow-Credentials": true,
+    };
+
+    res.writeHead(200, headers);
+    res.end();
+  },
+});
 
 io.on("connection", (socket) => {
   socket.on("join", ({ username, room }, callback) => {
