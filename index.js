@@ -5,21 +5,12 @@ const cors = require("cors");
 const { addUser, getUser, getUsersInRoom, removeUser } = require("./src/users");
 
 const app = express();
-app.use(cors());
-
 const server = http.createServer(app);
-const io = socketio(server, { origins: "*:*" });
-
-// app.use(function (req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header(
-//     "Access-Control-Allow-Headers",
-//     "Origin, X-Requested-With, Content-Type, Accept"
-//   );
-//   next();
-// });
-
+const io = socketio(server);
 const port = process.env.PORT;
+
+app.use(cors());
+app.options("*", cors());
 
 io.on("connection", (socket) => {
   socket.on("join", ({ username, room }, callback) => {
